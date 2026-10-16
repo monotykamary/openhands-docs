@@ -1,0 +1,50 @@
+---
+title: CoralBricks
+description: Run OpenHands on GLM 5.3 and DeepSeek V4.1 Flash served by CoralBricks, an OpenAI-compatible inference API with 1M-token context.
+---
+
+[CoralBricks](https://www.coralbricks.ai) serves open models through an OpenAI-compatible API at
+`https://inference.coralbricks.ai/v1`. LiteLLM supports it as the `coralbricks` provider
+([LiteLLM docs](https://docs.litellm.ai/docs/providers/coralbricks)).
+
+## Get an API Key
+
+Create a key on the [CoralBricks API keys page](https://www.coralbricks.ai/api-keys). Keys start with `cb_`.
+
+## Configuration
+
+In Agent Canvas, open `Settings > LLM`, add an LLM profile, and use the `Advanced` tab:
+
+- `Custom Model` to `openai/` plus a CoralBricks model ID, for example `openai/glm-5.3-fast`
+- `Base URL` to `https://inference.coralbricks.ai/v1`
+- `API Key` to your CoralBricks key
+
+Save the profile and start a new conversation to verify the model responds.
+
+| Model | Model string |
+|---|---|
+| GLM 5.3 | `openai/glm-5.3-fast` |
+| DeepSeek V4.1 Flash | `openai/deepseek-v4.1-flash-fast` |
+
+Both models support tool calling over Chat Completions and have a 1M-token context window. To let OpenHands
+read the context window, set `Model Canonical Name` in the `All` tab to `coralbricks/glm-5.3-fast` or
+`coralbricks/deepseek-v4.1-flash-fast`.
+
+<Note>
+  OpenHands sends the conversation ID as `prompt_cache_key`, so each conversation keeps its own prompt cache.
+  CoralBricks bills cached input tokens at $0.
+</Note>
+
+## Use It With the SDK
+
+```python
+from pydantic import SecretStr
+from openhands.sdk import LLM
+
+llm = LLM(
+    model="openai/glm-5.3-fast",
+    base_url="https://inference.coralbricks.ai/v1",
+    api_key=SecretStr("<your-coralbricks-key>"),
+    usage_id="agent",
+)
+```
